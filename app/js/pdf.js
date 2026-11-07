@@ -58,7 +58,7 @@
     write('<< /Type /Pages /Count ' + nPages + ' /Kids [' + pages.map((_, i) => pageObj(i) + ' 0 R').join(' ') + '] >>\nendobj\n');
     startObj(3); write('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>\nendobj\n');
     startObj(4);
-    write('<< /Producer (Pagekeep) /Title ' + pdfTextHex(opts.title || 'Scan') +
+    write('<< /Producer (Pagekeep Scan) /Title ' + pdfTextHex(opts.title || 'Scan') +
       (opts.author ? ' /Author ' + pdfTextHex(opts.author) : '') + ' >>\nendobj\n');
 
     pages.forEach((pg, i) => {

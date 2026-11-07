@@ -1,4 +1,4 @@
-# Pagekeep
+# Pagekeep Scan
 
 Scan paper with your phone camera and keep it as clean, searchable PDFs. Works offline; scans never leave your device.
 

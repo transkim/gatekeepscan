@@ -22,7 +22,7 @@ function createWindow() {
     height: 820,
     minWidth: 380,
     minHeight: 560,
-    title: 'Pagekeep',
+    title: 'Pagekeep Scan',
     icon: path.join(APP_DIR, 'img', 'icon.png'),
     backgroundColor: '#f4f1ea',
     autoHideMenuBar: true,

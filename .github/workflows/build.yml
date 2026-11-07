@@ -32,7 +32,7 @@ jobs:
       - run: npx electron-builder --win nsis --x64 --publish never
       - uses: actions/upload-artifact@v4
         with:
-          name: Pagekeep-Windows-installer
+          name: Pagekeep-Scan-Windows-installer
           path: dist/*.exe
 
   android:
@@ -68,8 +68,8 @@ jobs:
       - run: npm run sync
       - run: ./gradlew assembleDebug --no-daemon
         working-directory: mobile/android
-      - run: cp android/app/build/outputs/apk/debug/app-debug.apk Pagekeep-debug.apk
+      - run: cp android/app/build/outputs/apk/debug/app-debug.apk Pagekeep-Scan-debug.apk
       - uses: actions/upload-artifact@v4
         with:
-          name: Pagekeep-Android-apk
-          path: mobile/Pagekeep-debug.apk
+          name: Pagekeep-Scan-Android-apk
+          path: mobile/Pagekeep-Scan-debug.apk

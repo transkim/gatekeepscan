@@ -3,7 +3,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const IP = window.ImgProc;
-  const VERSION = '0.1.0';
+  const VERSION = '0.1.1';
 
   const state = {
     docs: [],
@@ -1220,7 +1220,7 @@
     $('set-size').value = state.settings.size;
     $('set-prefix').value = state.settings.prefix;
     const est = await DB.estimate();
-    $('about').textContent = 'Pagekeep ' + VERSION + ' · ' + Platform.platform + '. Scans stay on this device' +
+    $('about').textContent = 'Pagekeep Scan ' + VERSION + ' · ' + Platform.platform + '. Scans stay on this device' +
       (est && est.usage ? ' (' + (est.usage / 1048576).toFixed(0) + ' MB used)' : '') + '. Text recognition runs offline.';
     sheet('sheet-settings');
   };

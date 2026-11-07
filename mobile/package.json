@@ -1,8 +1,8 @@
 {
   "name": "pagekeep-mobile",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
-  "description": "Pagekeep Android app (Capacitor shell around ../app)",
+  "description": "Pagekeep Scan Android app (Capacitor shell around ../app)",
   "scripts": {
     "copy-web": "node -e \"const fs=require('fs');fs.rmSync('www',{recursive:true,force:true});fs.cpSync('../app','www',{recursive:true})\"",
     "sync": "npm run copy-web && cap sync android"

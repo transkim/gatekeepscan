@@ -50,8 +50,8 @@
       name = safeName(name);
       if (isNative && P.Filesystem) {
         const data = await blobToBase64(blob);
-        await P.Filesystem.writeFile({ path: 'Pagekeep/' + name, data, directory: 'DOCUMENTS', recursive: true });
-        return 'Documents/Pagekeep/' + name;
+        await P.Filesystem.writeFile({ path: 'Pagekeep Scan/' + name, data, directory: 'DOCUMENTS', recursive: true });
+        return 'Documents/Pagekeep Scan/' + name;
       }
       download(blob, name);
       return isDesktop ? name : 'your downloads';

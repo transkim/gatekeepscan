@@ -1,7 +1,7 @@
 {
   "name": "pagekeep",
-  "version": "0.1.0",
-  "description": "Pagekeep: scan documents with your camera, straighten and clean them, export searchable PDFs. Works offline.",
+  "version": "0.1.1",
+  "description": "Pagekeep Scan: scan documents with your camera, straighten and clean them, export searchable PDFs. Works offline.",
   "main": "src/main.js",
   "license": "MIT",
   "author": {
@@ -19,7 +19,7 @@
   },
   "build": {
     "appId": "app.pagekeep.desktop",
-    "productName": "Pagekeep",
+    "productName": "Pagekeep Scan",
     "files": [
       "src/**",
       "app/**",
@@ -39,8 +39,8 @@
       "oneClick": false,
       "allowToChangeInstallationDirectory": true,
       "createDesktopShortcut": true,
-      "artifactName": "Pagekeep-Setup-${version}.exe",
-      "shortcutName": "Pagekeep"
+      "artifactName": "Pagekeep-Scan-Setup-${version}.exe",
+      "shortcutName": "Pagekeep Scan"
     },
     "copyright": "Copyright © 2026 Hajj Abdul Hakim"
   }

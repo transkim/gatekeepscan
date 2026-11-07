@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#1c2b33">
+  <title>Pagekeep</title>
+  <link rel="icon" href="img/icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="i-scan" viewBox="0 0 24 24"><path d="M4 8V5a1 1 0 0 1 1-1h3M16 4h3a1 1 0 0 1 1 1v3M20 16v3a1 1 0 0 1-1 1h-3M8 20H5a1 1 0 0 1-1-1v-3"/><path d="M8 12h8"/></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+    <symbol id="i-next" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+    <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+    <symbol id="i-rotl" viewBox="0 0 24 24"><path d="M4 4v5h5"/><path d="M4.6 13a8 8 0 1 0 1.8-6.4L4 9"/></symbol>
+    <symbol id="i-rotr" viewBox="0 0 24 24"><path d="M20 4v5h-5"/><path d="M19.4 13a8 8 0 1 1-1.8-6.4L20 9"/></symbol>
+    <symbol id="i-crop" viewBox="0 0 24 24"><path d="M6 2v14a2 2 0 0 0 2 2h14"/><path d="M18 22V8a2 2 0 0 0-2-2H2"/></symbol>
+    <symbol id="i-wand" viewBox="0 0 24 24"><path d="m4 20 11-11M14 4v2M19 9h2M17.5 5.5 19 4M9 4l.5 1.5M19 14l1 .5"/><path d="m13 8 3 3"/></symbol>
+    <symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 7h10M18 7h2M4 17h4M12 17h8"/><circle cx="16" cy="7" r="2"/><circle cx="10" cy="17" r="2"/></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M3 20c3-1 4-4 6-4s1 3 4 3 3-3 5-3"/><path d="m14 4 4 4-7 7H7v-4z"/></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M4 6V4h16v2M12 4v16M9 20h6"/></symbol>
+    <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></symbol>
+    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="m8.2 10.8 7.6-4.4M8.2 13.2l7.6 4.4"/></symbol>
+    <symbol id="i-save" viewBox="0 0 24 24"><path d="M12 4v11M7 10l5 5 5-5M5 20h14"/></symbol>
+    <symbol id="i-pdf" viewBox="0 0 24 24"><path d="M14 3H6a1 1 0 0 0-1 1v16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V8z"/><path d="M14 3v5h5M8.5 13h7M8.5 17h5"/></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4"/></symbol>
+    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="12" cy="19" r="1.4"/></symbol>
+    <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+    <symbol id="i-bolt" viewBox="0 0 24 24"><path d="M13 3 5 14h6l-1 7 8-11h-6z"/></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V5a1 1 0 0 0-1-1H5a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h3"/></symbol>
+    <symbol id="i-edit" viewBox="0 0 24 24"><path d="m15 5 4 4L8 20H4v-4z"/></symbol>
+    <symbol id="i-full" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/></symbol>
+    <symbol id="i-detect" viewBox="0 0 24 24"><path d="M6 5 19 7l-2 12L4 17z"/><circle cx="6" cy="5" r="1.5"/><circle cx="19" cy="7" r="1.5"/><circle cx="17" cy="19" r="1.5"/><circle cx="4" cy="17" r="1.5"/></symbol>
+    <symbol id="i-pages" viewBox="0 0 24 24"><rect x="7" y="3" width="13" height="16" rx="1.5"/><path d="M4 7v12.5A1.5 1.5 0 0 0 5.5 21H16"/></symbol>
+    <symbol id="i-card" viewBox="0 0 24 24"><rect x="3" y="6" width="18" height="12" rx="2"/><circle cx="8.5" cy="12" r="2"/><path d="M13 10.5h5M13 13.5h3"/></symbol>
+    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 4v16M3 16l4 4 4-4M17 20V4M13 8l4-4 4 4"/></symbol>
+  </defs>
+</svg>
+
+<!-- ============ LIBRARY ============ -->
+<section id="v-library" class="view active">
+  <header class="topbar brandbar">
+    <div class="brand"><img src="img/icon.png" alt=""><span>Pagekeep</span></div>
+    <button class="icon-btn" id="btn-settings" aria-label="Settings"><svg><use href="#i-gear"/></svg></button>
+  </header>
+  <div class="searchrow">
+    <label class="search"><svg><use href="#i-search"/></svg><input id="search" type="search" placeholder="Search names and text in your scans"></label>
+    <button class="icon-btn" id="btn-sort" aria-label="Sort"><svg><use href="#i-sort"/></svg></button>
+  </div>
+  <div id="lib-summary" class="lib-summary"></div>
+  <div id="doc-list" class="doc-list"></div>
+  <div id="lib-empty" class="empty hidden">
+    <div class="empty-art"><svg viewBox="0 0 120 120"><rect x="28" y="16" width="64" height="86" rx="6" class="ea-page"/><path d="M40 38h40M40 50h40M40 62h28" class="ea-line"/><path d="M18 30V18h12M90 18h12v12M102 90v12H90M30 102H18V90" class="ea-corner"/></svg></div>
+    <h2>Your scans live here</h2>
+    <p>Point your camera at a page. Pagekeep finds the edges, straightens it and cleans it up.</p>
+  </div>
+  <div class="fab-row">
+    <button class="fab-mini" id="btn-import" aria-label="Import photos"><svg><use href="#i-image"/></svg></button>
+    <button class="fab" id="btn-scan"><svg><use href="#i-scan"/></svg><span>Scan</span></button>
+  </div>
+</section>
+
+<!-- ============ CAMERA ============ -->
+<section id="v-camera" class="view dark">
+  <div class="cam-stage">
+    <video id="cam-video" playsinline muted></video>
+    <canvas id="cam-overlay"></canvas>
+    <div id="cam-msg" class="cam-msg hidden"></div>
+    <div id="cam-flash" class="cam-flash"></div>
+  </div>
+  <header class="cam-top">
+    <button class="icon-btn light" id="cam-close" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+    <div class="cam-hint" id="cam-hint">Looking for a page…</div>
+    <div class="cam-top-right">
+      <button class="icon-btn light hidden" id="cam-torch" aria-label="Torch"><svg><use href="#i-bolt"/></svg></button>
+      <button class="pill-toggle" id="cam-auto" aria-pressed="true">Auto</button>
+    </div>
+  </header>
+  <div class="cam-bottom">
+    <div class="cam-modes" role="tablist">
+      <button data-mode="single">Single</button>
+      <button data-mode="batch" class="on">Batch</button>
+      <button data-mode="id">ID card</button>
+    </div>
+    <div class="cam-controls">
+      <button class="cam-side" id="cam-import" aria-label="Import photos"><svg><use href="#i-image"/></svg></button>
+      <button class="shutter" id="cam-shutter" aria-label="Capture"><span></span></button>
+      <button class="cam-side cam-stack hidden" id="cam-done" aria-label="Done"><img id="cam-stack-img" alt=""><b id="cam-count">0</b></button>
+      <div class="cam-side spacer" id="cam-spacer"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ============ CROP ============ -->
+<section id="v-crop" class="view dark">
+  <header class="topbar dark">
+    <button class="icon-btn light" id="crop-cancel" aria-label="Cancel"><svg><use href="#i-back"/></svg></button>
+    <h1 id="crop-title">Adjust corners</h1>
+    <button class="icon-btn accent" id="crop-ok" aria-label="Done"><svg><use href="#i-check"/></svg></button>
+  </header>
+  <div class="crop-stage" id="crop-stage">
+    <canvas id="crop-img"></canvas>
+    <svg id="crop-svg"></svg>
+    <canvas id="crop-loupe" class="loupe hidden" width="180" height="180"></canvas>
+  </div>
+  <footer class="toolbar dark">
+    <button id="crop-auto"><svg><use href="#i-detect"/></svg><span>Auto</span></button>
+    <button id="crop-full"><svg><use href="#i-full"/></svg><span>Whole photo</span></button>
+  </footer>
+</section>
+
+<!-- ============ DOCUMENT ============ -->
+<section id="v-doc" class="view">
+  <header class="topbar">
+    <button class="icon-btn" id="doc-back" aria-label="Back"><svg><use href="#i-back"/></svg></button>
+    <button class="doc-title" id="doc-title"><span id="doc-name"></span><svg><use href="#i-edit"/></svg></button>
+    <button class="icon-btn" id="doc-more" aria-label="More"><svg><use href="#i-more"/></svg></button>
+  </header>
+  <div class="doc-meta" id="doc-meta"></div>
+  <div class="page-grid" id="page-grid"></div>
+  <p class="hint-small">Press and hold a page to drag it into a new place.</p>
+  <footer class="toolbar">
+    <button id="doc-add"><svg><use href="#i-plus"/></svg><span>Add</span></button>
+    <button id="doc-text"><svg><use href="#i-text"/></svg><span>Text</span></button>
+    <button id="doc-sign"><svg><use href="#i-pen"/></svg><span>Sign</span></button>
+    <button id="doc-share"><svg><use href="#i-share"/></svg><span>Share</span></button>
+    <button id="doc-pdf" class="primary"><svg><use href="#i-pdf"/></svg><span>PDF</span></button>
+  </footer>
+</section>
+
+<!-- ============ PAGE EDITOR ============ -->
+<section id="v-page" class="view dark">
+  <header class="topbar dark">
+    <button class="icon-btn light" id="page-back" aria-label="Back"><svg><use href="#i-back"/></svg></button>
+    <h1 id="page-title">Page 1</h1>
+    <button class="icon-btn light" id="page-delete" aria-label="Delete page"><svg><use href="#i-trash"/></svg></button>
+  </header>
+  <div class="page-stage" id="page-stage">
+    <button class="nav-arrow left" id="page-prev" aria-label="Previous page"><svg><use href="#i-back"/></svg></button>
+    <div class="page-canvas-wrap" id="page-wrap">
+      <canvas id="page-canvas"></canvas>
+      <div id="sig-layer" class="sig-layer"></div>
+      <div class="busy hidden" id="page-busy"><i></i></div>
+    </div>
+    <button class="nav-arrow right" id="page-next" aria-label="Next page"><svg><use href="#i-next"/></svg></button>
+  </div>
+  <div class="panel" id="panel-filters"><div class="filter-strip" id="filter-strip"></div></div>
+  <div class="panel hidden" id="panel-adjust">
+    <label>Brightness <input type="range" id="adj-bright" min="-60" max="60" value="0"></label>
+    <label>Contrast <input type="range" id="adj-contrast" min="-60" max="60" value="0"></label>
+    <button class="link" id="adj-reset">Reset</button>
+  </div>
+  <div class="panel hidden" id="panel-sign">
+    <span>Drag the signature into place. Drag the corner dot to resize.</span>
+    <button class="btn small" id="sign-new">New signature</button>
+    <button class="btn small" id="sign-remove">Remove</button>
+    <button class="btn small primary" id="sign-done">Done</button>
+  </div>
+  <footer class="toolbar dark">
+    <button id="tool-crop"><svg><use href="#i-crop"/></svg><span>Crop</span></button>
+    <button id="tool-rotate"><svg><use href="#i-rotr"/></svg><span>Rotate</span></button>
+    <button id="tool-filter" class="on"><svg><use href="#i-wand"/></svg><span>Filters</span></button>
+    <button id="tool-adjust"><svg><use href="#i-sliders"/></svg><span>Adjust</span></button>
+    <button id="tool-sign"><svg><use href="#i-pen"/></svg><span>Sign</span></button>
+    <button id="tool-text"><svg><use href="#i-text"/></svg><span>Text</span></button>
+  </footer>
+</section>
+
+<!-- ============ SHEETS & DIALOGS ============ -->
+<div class="scrim hidden" id="scrim"></div>
+
+<div class="sheet hidden" id="sheet-export">
+  <div class="grab"></div>
+  <h3>Export PDF</h3>
+  <label class="field">File name <input id="exp-name" type="text"></label>
+  <div class="field">Page size
+    <div class="seg" id="exp-size"><button data-v="a4">A4</button><button data-v="letter">Letter</button><button data-v="legal">Legal</button><button data-v="fit">Fit photo</button></div>
+  </div>
+  <div class="field">Quality
+    <div class="seg" id="exp-quality"><button data-v="high">High</button><button data-v="medium">Medium</button><button data-v="small">Small file</button></div>
+  </div>
+  <label class="check"><input type="checkbox" id="exp-ocr"> <span>Searchable PDF<small>Adds the recognised text so you can search and copy it (takes a moment per page)</small></span></label>
+  <div class="progress hidden" id="exp-progress"><i></i><span></span></div>
+  <div class="sheet-actions">
+    <button class="btn" id="exp-save"><svg><use href="#i-save"/></svg>Save</button>
+    <button class="btn primary" id="exp-share"><svg><use href="#i-share"/></svg>Share</button>
+  </div>
+</div>
+
+<div class="sheet hidden" id="sheet-text">
+  <div class="grab"></div>
+  <h3 id="text-title">Text</h3>
+  <div class="progress hidden" id="text-progress"><i></i><span></span></div>
+  <textarea id="text-area" spellcheck="false" placeholder="Recognised text appears here."></textarea>
+  <div class="sheet-actions">
+    <button class="btn" id="text-rerun"><svg><use href="#i-text"/></svg>Re-read</button>
+    <button class="btn" id="text-copy"><svg><use href="#i-copy"/></svg>Copy</button>
+    <button class="btn primary" id="text-share"><svg><use href="#i-share"/></svg>Share</button>
+  </div>
+</div>
+
+<div class="sheet hidden" id="sheet-menu">
+  <div class="grab"></div>
+  <div class="menu" id="menu-items"></div>
+</div>
+
+<div class="sheet hidden" id="sheet-settings">
+  <div class="grab"></div>
+  <h3>Settings</h3>
+  <div class="field">Filter for new scans
+    <select id="set-filter"></select>
+  </div>
+  <label class="check"><input type="checkbox" id="set-auto"> <span>Auto capture<small>Take the photo by itself when a page is held steady</small></span></label>
+  <div class="field">Default page size
+    <select id="set-size"><option value="a4">A4</option><option value="letter">Letter</option><option value="legal">Legal</option><option value="fit">Fit photo</option></select>
+  </div>
+  <div class="field">Name new scans
+    <input id="set-prefix" type="text" placeholder="Scan">
+  </div>
+  <p class="about" id="about"></p>
+</div>
+
+<div class="modal hidden" id="modal-sign">
+  <div class="modal-card">
+    <h3>Draw your signature</h3>
+    <canvas id="sign-pad"></canvas>
+    <div class="sign-colors" id="sign-colors">
+      <button data-c="#111111" class="on" style="--c:#111111" aria-label="Black"></button>
+      <button data-c="#1d3fbf" style="--c:#1d3fbf" aria-label="Blue"></button>
+      <button data-c="#b3261e" style="--c:#b3261e" aria-label="Red"></button>
+    </div>
+    <div class="sheet-actions">
+      <button class="btn" id="sign-clear">Clear</button>
+      <button class="btn" id="sign-cancel">Cancel</button>
+      <button class="btn primary" id="sign-use">Use</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal hidden" id="modal-prompt">
+  <div class="modal-card">
+    <h3 id="prompt-title"></h3>
+    <p id="prompt-msg"></p>
+    <input id="prompt-input" type="text">
+    <div class="sheet-actions">
+      <button class="btn" id="prompt-cancel">Cancel</button>
+      <button class="btn primary" id="prompt-ok">OK</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast hidden" id="toast"></div>
+<input type="file" id="file-input" accept="image/*" multiple hidden>
+<input type="file" id="file-capture" accept="image/*" capture="environment" hidden>
+
+<script src="js/platform.js"></script>
+<script src="js/imgproc.js"></script>
+<script src="js/pdf.js"></script>
+<script src="js/db.js"></script>
+<script src="js/scan.js"></script>
+<script src="vendor/tesseract/tesseract.min.js"></script>
+<script src="js/ocr.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

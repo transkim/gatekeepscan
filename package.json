@@ -1,0 +1,47 @@
+{
+  "name": "pagekeep",
+  "version": "0.1.0",
+  "description": "Pagekeep: scan documents with your camera, straighten and clean them, export searchable PDFs. Works offline.",
+  "main": "src/main.js",
+  "license": "MIT",
+  "author": {
+    "name": "Hajj Abdul Hakim",
+    "url": "https://github.com/transkim"
+  },
+  "scripts": {
+    "start": "electron .",
+    "test": "node --test test/*.test.js",
+    "dist:win": "electron-builder --win nsis --x64"
+  },
+  "devDependencies": {
+    "electron": "33.2.1",
+    "electron-builder": "26.0.12"
+  },
+  "build": {
+    "appId": "app.pagekeep.desktop",
+    "productName": "Pagekeep",
+    "files": [
+      "src/**",
+      "app/**",
+      "package.json"
+    ],
+    "directories": {
+      "output": "dist",
+      "buildResources": "build"
+    },
+    "win": {
+      "target": [
+        "nsis"
+      ],
+      "icon": "build/icon.ico"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "artifactName": "Pagekeep-Setup-${version}.exe",
+      "shortcutName": "Pagekeep"
+    },
+    "copyright": "Copyright © 2026 Hajj Abdul Hakim"
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "appId": "app.pagekeep.scanner",
+  "appName": "Pagekeep",
+  "webDir": "www",
+  "android": {
+    "backgroundColor": "#f4f1ea"
+  }
+}

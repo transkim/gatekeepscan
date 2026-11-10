@@ -100,3 +100,46 @@ test('rotate swaps dimensions and moves pixels', () => {
   assert.strictEqual(r.width, 2); assert.strictEqual(r.height, 3);
   assert.strictEqual(r.data[(0 * 2 + 1) * 4], 255); // now top-right
 });
+
+test('keeps a dark header band that reaches the page edge', () => {
+  const w = 240, h = 320;
+  const quad = [{ x: 40, y: 40 }, { x: 200, y: 48 }, { x: 206, y: 280 }, { x: 30, y: 270 }];
+  const img = scene(w, h, quad, [185, 185, 180], [245, 245, 242], 3);
+  // paint the top fifth of the page dark blue (in page coordinates)
+  const H = P.homography(quad, [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }]);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const u = P.applyH(H, x, y);
+    if (u.x > 0 && u.x < 1 && u.y > 0 && u.y < 0.2) { const o = (y * w + x) * 4; img.data[o] = 25; img.data[o + 1] = 40; img.data[o + 2] = 90; }
+  }
+  const r = P.detectQuad(img);
+  assert.ok(r, 'should find a page');
+  assert.ok(maxCornerError(r.quad, quad, w, h) < 8, 'whole page incl. the band: ' + JSON.stringify(r.quad.map((p) => [Math.round(p.x * w), Math.round(p.y * h)])));
+});
+
+test('does not stop at ruled lines inside the page', () => {
+  const w = 240, h = 320;
+  const quad = [{ x: 30, y: 30 }, { x: 205, y: 36 }, { x: 212, y: 290 }, { x: 24, y: 284 }];
+  const img = scene(w, h, quad, [70, 60, 50], [250, 250, 248], 5);
+  const H = P.homography(quad, [{ x: 0, y: 0 }, { x: 1, y: 0 }, { x: 1, y: 1 }, { x: 0, y: 1 }]);
+  for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+    const u = P.applyH(H, x, y);
+    if (u.x > 0.08 && u.x < 0.92 && u.y > 0.08 && u.y < 0.92 && (Math.abs((u.y * 10) % 1) < 0.04 || Math.abs((u.x * 4) % 1) < 0.02)) {
+      const o = (y * w + x) * 4; img.data[o] = img.data[o + 1] = img.data[o + 2] = 0;
+    }
+  }
+  const r = P.detectQuad(img);
+  assert.ok(r, 'should find a page');
+  assert.ok(maxCornerError(r.quad, quad, w, h) < 8, 'outer page, not the table: ' + JSON.stringify(r.quad.map((p) => [Math.round(p.x * w), Math.round(p.y * h)])));
+});
+
+test('the crop never trims into the page', () => {
+  const w = 240, h = 320;
+  const quad = [{ x: 46, y: 40 }, { x: 200, y: 56 }, { x: 213, y: 280 }, { x: 26, y: 266 }];
+  const r = P.detectQuad(scene(w, h, quad, [90, 60, 40], [235, 232, 225]));
+  assert.ok(r);
+  const cx = quad.reduce((s, p) => s + p.x, 0) / 4, cy = quad.reduce((s, p) => s + p.y, 0) / 4;
+  r.quad.forEach((p, i) => {
+    const found = Math.hypot(p.x * w - cx, p.y * h - cy), real = Math.hypot(quad[i].x - cx, quad[i].y - cy);
+    assert.ok(found > real - 1.5, 'corner ' + i + ' is inside the page by ' + (real - found).toFixed(1) + 'px');
+  });
+});

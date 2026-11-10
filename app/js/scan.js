@@ -97,9 +97,21 @@
     return { blob, width: c.width, height: c.height, canvas: c };
   }
 
+  // Page detection works on a small copy (256px), drawn into one reused canvas so the live camera
+  // loop does not allocate a new one for every frame.
+  let detCanvas = null;
   async function detect(src) {
-    const small = imageData(src, 360);
-    const r = await call('detect', { image: small });
+    const { w, h } = dims(src);
+    if (!w || !h) return null;
+    const k = 256 / Math.max(w, h);
+    const cw = Math.max(1, Math.round(w * k)), ch = Math.max(1, Math.round(h * k));
+    if (!detCanvas) detCanvas = document.createElement('canvas');
+    if (detCanvas.width !== cw || detCanvas.height !== ch) { detCanvas.width = cw; detCanvas.height = ch; }
+    const g = detCanvas.getContext('2d', { willReadFrequently: true });
+    g.imageSmoothingQuality = 'medium';
+    g.drawImage(src, 0, 0, cw, ch);
+    const d = g.getImageData(0, 0, cw, ch);
+    const r = await call('detect', { image: { width: cw, height: ch, data: d.data } });
     return r ? r.quad : null;
   }
 

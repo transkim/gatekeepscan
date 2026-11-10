@@ -3,7 +3,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const IP = window.ImgProc;
-  const VERSION = '0.1.1';
+  const VERSION = '0.2.0';
 
   const state = {
     docs: [],
@@ -286,15 +286,14 @@
 
   // ---------- camera ----------
   const camera = {
-    stream: null, track: null, timer: null, busy: false, mode: 'batch', target: null,
-    captures: [], quad: null, display: null, history: [], lastShot: 0, torch: false, capturing: false,
+    stream: null, track: null, run: 0, mode: 'batch', target: null,
+    captures: [], quad: null, display: null, steady: null, shot: null, lastShot: 0, torch: false, capturing: false,
   };
 
   async function openCamera(docId) {
     camera.target = docId;
     camera.captures = [];
-    camera.quad = camera.display = null;
-    camera.history = [];
+    camera.quad = camera.display = camera.steady = camera.shot = null;
     updateStack();
     $('cam-auto').setAttribute('aria-pressed', String(!!state.settings.auto));
     setMode(camera.mode);
@@ -315,7 +314,8 @@
       try { await camera.track.applyConstraints({ advanced: [{ focusMode: 'continuous' }] }); } catch (_) { /* optional */ }
       const caps = camera.track.getCapabilities ? camera.track.getCapabilities() : {};
       $('cam-torch').classList.toggle('hidden', !caps.torch);
-      camera.timer = setInterval(detectTick, 200);
+      camera.run = (camera.run || 0) + 1;
+      detectLoop(camera.run);
       $('cam-hint').textContent = 'Looking for a page…';
     } catch (err) {
       const m = $('cam-msg');
@@ -328,7 +328,7 @@
   }
 
   function stopCamera() {
-    clearInterval(camera.timer); camera.timer = null;
+    camera.run = (camera.run || 0) + 1;      // stops the detection loop
     if (camera.stream) camera.stream.getTracks().forEach((t) => t.stop());
     camera.stream = camera.track = null;
     $('cam-video').srcObject = null;
@@ -403,47 +403,53 @@
     });
   }
 
+  const quadDist = (a, b) => Math.max(...a.map((p, k) => Math.hypot(p.x - b[k].x, p.y - b[k].y)));
+  const STEADY_MS = 550;   // how long the page must hold still before auto capture
+
+  // Runs detection back to back (as fast as the device manages, at most ~14 times a second).
+  async function detectLoop(run) {
+    while (camera.run === run) {
+      const t0 = performance.now();
+      await detectTick();
+      await new Promise((r) => setTimeout(r, Math.max(15, 70 - (performance.now() - t0))));
+    }
+  }
+
   async function detectTick() {
     const v = $('cam-video');
-    if (camera.busy || camera.capturing || !v.videoWidth || current() !== 'v-camera') return;
-    camera.busy = true;
+    if (camera.capturing || !v.videoWidth || current() !== 'v-camera') return;
     try {
       const q = await Scan.detect(v);
+      const now = performance.now();
       if (q) {
+        camera.misses = 0;
         camera.quad = q;
-        camera.display = camera.display
-          ? camera.display.map((p, i) => ({ x: p.x * 0.4 + q[i].x * 0.6, y: p.y * 0.4 + q[i].y * 0.6 }))
+        // follow quickly, but smooth out jitter
+        camera.display = camera.display && quadDist(camera.display, q) < 0.08
+          ? camera.display.map((p, i) => ({ x: p.x * 0.35 + q[i].x * 0.65, y: p.y * 0.35 + q[i].y * 0.65 }))
           : q;
-        camera.history.push(q);
-        if (camera.history.length > 6) camera.history.shift();
+        if (!camera.steady || quadDist(camera.steady.quad, q) > 0.03) camera.steady = { quad: q, since: now, n: 0 };
+        camera.steady.n++;
+        // after an automatic shot, wait for a different page before shooting again
+        if (camera.shot && quadDist(camera.shot, q) > 0.07) camera.shot = null;
       } else {
         camera.misses = (camera.misses || 0) + 1;
-        if (camera.misses > 3) { camera.quad = camera.display = null; camera.history = []; camera.misses = 0; }
+        if (camera.misses >= 3) { camera.quad = camera.display = camera.steady = camera.shot = null; }
       }
-      if (q) camera.misses = 0;
-      // stability: how many recent detections agree with the latest one
-      let stable = 0;
-      if (camera.quad && camera.history.length) {
-        const last = camera.history[camera.history.length - 1];
-        for (let i = camera.history.length - 1; i >= 0; i--) {
-          const h = camera.history[i];
-          const d = Math.max(...h.map((p, k) => Math.hypot(p.x - last[k].x, p.y - last[k].y)));
-          if (d < 0.02) stable++; else break;
-        }
-      }
-      const frac = Math.min(1, stable / 6);
-      drawOverlay(frac);
+      const frac = camera.quad && camera.steady ? Math.min(1, (now - camera.steady.since) / STEADY_MS) : 0;
+      const waiting = !!camera.shot;
+      drawOverlay(waiting ? 1 : frac);
       $('cam-shutter').classList.toggle('ready', !!camera.quad);
       const hint = $('cam-hint');
       if (!camera.quad) hint.textContent = camera.mode === 'id' && camera.captures.length === 1 ? 'Now scan the back' : camera.mode === 'id' ? 'Scan the front of the card' : 'Looking for a page…';
-      else if (state.settings.auto && frac < 1) hint.textContent = 'Hold steady…';
-      else hint.textContent = state.settings.auto ? 'Capturing' : 'Page found. Tap to capture';
-      if (state.settings.auto && frac >= 1 && Date.now() - camera.lastShot > 2200) capture();
+      else if (!state.settings.auto) hint.textContent = 'Page found. Tap to capture';
+      else if (waiting) hint.textContent = camera.mode === 'batch' ? 'Saved. Show the next page' : 'Saved';
+      else hint.textContent = frac < 1 ? 'Hold steady…' : 'Capturing';
+      if (state.settings.auto && !waiting && frac >= 1 && camera.steady.n >= 3 && Date.now() - camera.lastShot > 900) capture(true);
     } catch (_) { /* keep looking */ }
-    camera.busy = false;
   }
 
-  async function capture() {
+  async function capture(auto) {
     const v = $('cam-video');
     if (!v.videoWidth || camera.capturing) return;
     camera.capturing = true;
@@ -454,9 +460,15 @@
     try {
       const frame = Scan.toCanvas(v);
       const n = await Scan.normalize(frame);
-      const quad = (await Scan.detect(n.canvas)) || camera.quad;
+      // Detect again on the sharp still. If the live view had settled on a clearly bigger outline of
+      // the same scene, trust that one: better a sliver of desk than a page with its edge missing.
+      const live = camera.steady && performance.now() - camera.steady.since > 250 ? camera.quad : null;
+      let quad = await Scan.detect(n.canvas);
+      if (!quad) quad = camera.quad;
+      else if (live && IP.polyArea(live) > IP.polyArea(quad) * 1.02) quad = live;
       const cap = { blob: n.blob, width: n.width, height: n.height, quad, url: Scan.toCanvas(n.canvas, 160).toDataURL('image/jpeg', 0.6) };
-      camera.history = [];
+      camera.steady = null;
+      camera.shot = auto === true ? (camera.quad || quad) : null;
       if (camera.mode === 'single') {
         stopCamera();
         camera.capturing = false;
@@ -495,7 +507,7 @@
     await openDoc(doc.id);
   }
 
-  $('cam-shutter').onclick = capture;
+  $('cam-shutter').onclick = () => capture(false);
   $('cam-close').onclick = closeCamera;
   $('cam-done').onclick = finishCapture;
   $('cam-import').onclick = () => { const t = camera.target; stopCamera(); pickFiles(t); };
@@ -528,7 +540,7 @@
   function layoutCrop() {
     if (!crop.canvas) return;
     const stage = $('crop-stage');
-    const sw = stage.clientWidth, sh = stage.clientHeight, pad = 28;
+    const sw = stage.clientWidth, sh = stage.clientHeight, pad = 34;
     const k = Math.min((sw - pad * 2) / crop.canvas.width, (sh - pad * 2) / crop.canvas.height);
     const w = crop.canvas.width * k, h = crop.canvas.height * k;
     crop.rect = { x: (sw - w) / 2, y: (sh - h) / 2, w, h };
@@ -603,7 +615,7 @@
     const p = stageXY(e), r = crop.rect;
     const dx = (p.x - crop.drag.last.x) / r.w, dy = (p.y - crop.drag.last.y) / r.h;
     crop.drag.last = p;
-    const clamp = (v) => Math.min(1, Math.max(0, v));
+    const clamp = (v) => Math.min(1.15, Math.max(-0.15, v));   // a corner may sit just outside the photo
     const move = (i) => { crop.quad[i] = { x: clamp(crop.quad[i].x + dx), y: clamp(crop.quad[i].y + dy) }; };
     if (crop.drag.type === 'corner') move(crop.drag.i);
     else { move(crop.drag.i); move((crop.drag.i + 1) % 4); }
@@ -1244,7 +1256,7 @@
   Platform.onBack(goBack);
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') goBack();
-    if (current() === 'v-camera' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); capture(); }
+    if (current() === 'v-camera' && (e.key === ' ' || e.key === 'Enter')) { e.preventDefault(); capture(false); }
     if (current() === 'v-page' && !e.target.closest('input,textarea')) {
       if (e.key === 'ArrowLeft' && ed.idx > 0) openPage(ed.idx - 1);
       if (e.key === 'ArrowRight' && ed.idx < state.pages.length - 1) openPage(ed.idx + 1);

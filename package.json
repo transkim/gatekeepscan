@@ -1,6 +1,6 @@
 {
   "name": "pagekeep",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "description": "Pagekeep Scan: scan documents with your camera, straighten and clean them, export searchable PDFs. Works offline.",
   "main": "src/main.js",
   "license": "MIT",

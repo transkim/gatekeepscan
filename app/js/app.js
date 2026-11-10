@@ -3,7 +3,7 @@
   'use strict';
   const $ = (id) => document.getElementById(id);
   const IP = window.ImgProc;
-  const VERSION = '0.2.0';
+  const VERSION = '0.2.1';
 
   const state = {
     docs: [],
@@ -458,13 +458,21 @@
     const f = $('cam-flash');
     f.classList.add('on'); setTimeout(() => f.classList.remove('on'), 60);
     try {
+      // keep the video frame as a fallback, then ask the camera for a full-resolution photo
       const frame = Scan.toCanvas(v);
-      const n = await Scan.normalize(frame);
+      const vAspect = v.videoWidth / v.videoHeight;
+      $('cam-hint').textContent = 'Hold still…';
+      const photo = await Scan.takePhoto(camera.track);
+      let n = null;
+      if (photo) { try { n = await Scan.normalize(photo); } catch (_) { n = null; } }
+      const sameView = !n || Math.abs(n.width / n.height - vAspect) < 0.03;
+      if (!n || Math.max(n.width, n.height) < Math.max(frame.width, frame.height)) n = await Scan.normalize(frame);
       // Detect again on the sharp still. If the live view had settled on a clearly bigger outline of
       // the same scene, trust that one: better a sliver of desk than a page with its edge missing.
-      const live = camera.steady && performance.now() - camera.steady.since > 250 ? camera.quad : null;
+      // (Only when the photo shows the same view as the video; a 4:3 photo of a 16:9 video does not.)
+      const live = sameView && camera.steady && performance.now() - camera.steady.since > 250 ? camera.quad : null;
       let quad = await Scan.detect(n.canvas);
-      if (!quad) quad = camera.quad;
+      if (!quad && sameView) quad = camera.quad;
       else if (live && IP.polyArea(live) > IP.polyArea(quad) * 1.02) quad = live;
       const cap = { blob: n.blob, width: n.width, height: n.height, quad, url: Scan.toCanvas(n.canvas, 160).toDataURL('image/jpeg', 0.6) };
       camera.steady = null;

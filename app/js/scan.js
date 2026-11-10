@@ -2,8 +2,8 @@
 (function (root) {
   'use strict';
   const IP = root.ImgProc;
-  const SRC_MAX = 3200;   // longest side kept for originals
-  const OUT_MAX = 2480;   // longest side of a finished page (~300 dpi on A4 width-ish)
+  const SRC_MAX = 3600;   // longest side kept for originals
+  const OUT_MAX = 3000;   // longest side of a finished page (about 260 dpi on A4)
   const THUMB_MAX = 420;
 
   // ---- worker with main-thread fallback ----
@@ -89,11 +89,37 @@
   const toBlob = (canvas, type = 'image/jpeg', q = 0.88) =>
     new Promise((resolve) => canvas.toBlob(resolve, type, q));
 
+  // A real photo from the camera sensor (full resolution, focused), where the device supports it.
+  // The live video is only about 2 megapixels, which is what made scans look soft.
+  let photoSize = null;
+  async function takePhoto(track) {
+    if (!track || typeof ImageCapture === 'undefined') return null;
+    const timeout = (ms) => new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), ms));
+    try {
+      const ic = new ImageCapture(track);
+      if (!photoSize) {
+        photoSize = {};
+        try {
+          const caps = await Promise.race([ic.getPhotoCapabilities(), timeout(1500)]);
+          if (caps && caps.imageWidth && caps.imageWidth.max) {
+            // the biggest the sensor offers, up to about 12 megapixels
+            const k = Math.min(1, 4080 / Math.max(caps.imageWidth.max, caps.imageHeight.max));
+            photoSize = { imageWidth: Math.round(caps.imageWidth.max * k), imageHeight: Math.round(caps.imageHeight.max * k) };
+          }
+        } catch (_) { /* use the default size */ }
+      }
+      let blob;
+      try { blob = await Promise.race([ic.takePhoto(photoSize), timeout(5000)]); }
+      catch (_) { blob = await Promise.race([ic.takePhoto(), timeout(5000)]); }
+      return blob && blob.size > 1000 ? blob : null;
+    } catch (_) { return null; }
+  }
+
   // Store a capture at a sensible size so the library does not balloon.
   async function normalize(blobOrCanvas) {
     const src = blobOrCanvas instanceof Blob ? await decode(blobOrCanvas) : blobOrCanvas;
     const c = toCanvas(src, SRC_MAX);
-    const blob = await toBlob(c, 'image/jpeg', 0.9);
+    const blob = await toBlob(c, 'image/jpeg', 0.93);
     return { blob, width: c.width, height: c.height, canvas: c };
   }
 
@@ -154,7 +180,7 @@
     const canvas = dataToCanvas(out);
     await drawMarks(canvas, page);
     if (opts.preview) return { canvas };
-    const blob = await toBlob(canvas, 'image/jpeg', 0.88);
+    const blob = await toBlob(canvas, 'image/jpeg', 0.92);
     const thumb = await toBlob(toCanvas(canvas, THUMB_MAX), 'image/jpeg', 0.8);
     return { blob, thumb, width: canvas.width, height: canvas.height, canvas };
   }
@@ -196,7 +222,7 @@
   }
 
   root.Scan = {
-    call, decode, toCanvas, imageData, dataToCanvas, toBlob, normalize, detect, render, filterPreviews,
+    call, decode, toCanvas, imageData, dataToCanvas, toBlob, normalize, takePhoto, detect, render, filterPreviews,
     composeCards, cropToCanvas, forget: (id) => srcCache.delete(id), dims, OUT_MAX,
   };
 })(typeof self !== 'undefined' ? self : this);

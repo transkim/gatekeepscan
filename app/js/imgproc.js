@@ -873,9 +873,28 @@
     { id: 'ink', name: 'Ink saver' },
   ];
 
-  /* Apply a scan filter. opts: { brightness: -100..100, contrast: -100..100 } */
+  // Unsharp mask on brightness: crisper letter edges without colour fringes. Tiny differences
+  // (sensor noise, paper grain) are left alone.
+  function sharpen(img, amount) {
+    const { width: w, height: h, data: s } = img;
+    const L = luminance(img);
+    const r = Math.max(1, Math.round(Math.max(w, h) / 1500));
+    const B = boxBlur(boxBlur(L, w, h, r), w, h, r);
+    const out = makeImage(w, h), d = out.data;
+    for (let i = 0, o = 0; i < L.length; i++, o += 4) {
+      let diff = L[i] - B[i];
+      const a = diff < 0 ? -diff : diff;
+      diff = a < 2 ? 0 : (a < 6 ? diff * (a - 2) / 4 : diff) * amount;
+      d[o] = s[o] + diff; d[o + 1] = s[o + 1] + diff; d[o + 2] = s[o + 2] + diff; d[o + 3] = 255;
+    }
+    return out;
+  }
+
+  /* Apply a scan filter. opts: { brightness: -100..100, contrast: -100..100, sharpen: 0..2 (default 0.9) } */
   function applyFilter(img, filter, opts) {
     opts = opts || {};
+    const sh = opts.sharpen === undefined ? 0.9 : opts.sharpen;
+    if (filter !== 'original' && sh > 0) img = sharpen(img, sh);
     const { width: w, height: h, data: s } = img;
     const out = makeImage(w, h), d = out.data;
     const L = luminance(img);
@@ -961,7 +980,7 @@
 
   const api = {
     makeImage, luminance, boxBlur, otsu, convexHull, polyArea, orderQuad, quadFromHull, quadAngles,
-    detectQuad, detectByLines, detectByMask, homography, applyH, outputSize, warp, rotate, applyFilter, background, downscale, FILTERS,
+    detectQuad, detectByLines, detectByMask, homography, applyH, outputSize, warp, rotate, applyFilter, sharpen, background, downscale, FILTERS,
   };
   if (typeof module !== 'undefined' && module.exports) module.exports = api;
   else root.ImgProc = api;
